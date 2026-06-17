@@ -9,4 +9,9 @@ protected $allowedFields = [
 'username', 'total_harga', 'alamat', 'ongkir', 'status', 
 'bukti_pembayaran', 'created_at', 'updated_at' 
 ]; 
+
+public function updateStatus($id, $status)
+{
+    return $this->update($id, ['status' => $status]);
+}
 }

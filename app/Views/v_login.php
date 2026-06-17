@@ -1,91 +1,113 @@
-<?= $this->extend('layout_clear') ?>
-<?= $this->section('content') ?>
-<?php
-$username = [
-  'name' => 'username',
-  'id' => 'username',
-  'class' => 'form-control',
-  'required' => true,
-  'minlength' => 6
-];
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SINNA STORE - Login</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      padding: 20px;
+    }
+    .login-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 40px 32px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.3);
+    }
+    .logo-area {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .logo-area .brand-icon {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+    .logo-area .brand-icon i {
+      font-size: 28px;
+      color: #fff;
+    }
+    .logo-area h4 {
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 4px;
+    }
+    .logo-area p {
+      font-size: 14px;
+      color: #6c757d;
+      margin: 0;
+    }
+    .input-icon {
+      position: relative;
+    }
+    .input-icon .form-control {
+      padding-left: 40px;
+      height: 46px;
+    }
+    .input-icon .icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #adb5bd;
+      font-size: 18px;
+      z-index: 5;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
 
-$password = [
-  'name' => 'password',
-  'id' => 'password',
-  'class' => 'form-control',
-  'required' => true,
-  'minlength' => 7
-];
-?>
-<section class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
-        <div class="container">
-          <div class="row justify-content-center">
-            <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
-
-              <div class="d-flex justify-content-center py-4">
-                <a href="index.html" class="logo d-flex align-items-center w-auto">
-                <img src="<?php echo base_url() ?>NiceAdmin/assets/img/logo.png" alt="">
-<span class="d-none d-lg-block"> SINNA STORE </span>
-                </a>
-              </div><!-- End Logo -->
-
-              <div class="card mb-3">
-
-                <div class="card-body">
-
-                  <div class="pt-4 pb-2">
-                    <h5 class="card-title text-center pb-0 fs-4">Login to Your Account</h5>
-                    <p class="text-center small">Enter your username & password to login</p>
-                  </div>
-
-                  <?php
-if (session()->getFlashData('failed')) {
-?>
-    <div class="col-12 alert alert-danger" role="alert">
-        <hr>
-        <p class="mb-0">
-            <?= session()->getFlashData('failed') ?>
-        </p>
+<div class="login-card">
+  <div class="logo-area">
+    <div class="brand-icon">
+      <i class="bi bi-shop"></i>
     </div>
-<?php
-}
-?>
+    <h4>SINNA STORE</h4>
+    <p>Masuk untuk melanjutkan</p>
+  </div>
 
-<?= form_open('login', 'class = "row g-3 needs-validation"') ?>
+  <?php
+  if (session()->getFlashData('failed')) {
+  ?>
+  <div class="alert alert-danger d-flex align-items-center gap-2" role="alert">
+    <i class="bi bi-exclamation-circle-fill flex-shrink-0"></i>
+    <div><?= session()->getFlashData('failed') ?></div>
+  </div>
+  <?php
+  }
+  ?>
 
-<div class="col-12">
-    <label for="yourUsername" class="form-label">Username</label>
-    <div class="input-group has-validation">
-        <span class="input-group-text" id="inputGroupPrepend">@</span>
-        <?= form_input($username) ?>
-        <div class="invalid-feedback">Please enter your username.</div>
-    </div>
+  <?= form_open('login') ?>
+  <div class="mb-3 input-icon">
+    <i class="bi bi-person icon"></i>
+    <input type="text" name="username" id="username" class="form-control" placeholder="Username" required minlength="6">
+  </div>
+  <div class="mb-3 input-icon">
+    <i class="bi bi-lock icon"></i>
+    <input type="password" name="password" id="password" class="form-control" placeholder="Password" required minlength="7">
+  </div>
+  <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+    <i class="bi bi-box-arrow-in-right me-1"></i> Login
+  </button>
+  <?= form_close() ?>
 </div>
 
-<div class="col-12">
-    <label for="yourPassword" class="form-label">Password</label>
-		    <?= form_password($password) ?>
-    <div class="invalid-feedback">Please enter your password!</div>
-</div>
-<div class="col-12">
-    <?= form_submit('submit', 'Login', ['class' => 'btn btn-primary w-100']) ?>
-</div>
-
-<?= form_close() ?>
-                </div>
-              </div>
-
-              <div class="credits">
-                <!-- All the links in the footer should remain intact. -->
-                <!-- You can delete the links only if you purchased the pro version. -->
-                <!-- Licensing information: https://bootstrapmade.com/license/ -->
-                <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/ -->
-                Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
-              </div>
-
-            </div>
-          </div>
-        </div>
-
-      </section>
-<?= $this->endSection() ?>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -79,6 +79,57 @@ public function checkout()
     $data['total'] = $this->cart->total(); 
     return view('v_checkout', $data); 
 } 
+
+public function buy()
+{
+    $username = session()->get('username');
+    $alamat = $this->request->getPost('alamat');
+    $ongkir = $this->request->getPost('ongkir') ?? 0;
+    $cart = $this->cart->contents();
+
+    if (empty($cart)) {
+        return redirect()->to('keranjang')->with('error', 'Keranjang kosong!');
+    }
+
+    $total = 0;
+    foreach ($cart as $item) {
+        $total += $item['subtotal'];
+    }
+    $total += $ongkir;
+
+    $transaction_id = $this->transaction->insert([
+        'username'    => $username,
+        'total_harga' => $total,
+        'alamat'      => $alamat,
+        'ongkir'      => $ongkir,
+        'status'      => 0,
+        'created_at'  => date('Y-m-d H:i:s'),
+        'updated_at'  => date('Y-m-d H:i:s'),
+    ]);
+
+    foreach ($cart as $item) {
+        $this->transaction_detail->insert([
+            'transaction_id'  => $transaction_id,
+            'product_id'      => $item['id'],
+            'jumlah'          => $item['qty'],
+            'subtotal_harga'  => $item['subtotal'],
+        ]);
+    }
+
+    $this->cart->destroy();
+    return redirect()->to('profile')->with('success', 'Pesanan berhasil dibuat!');
+}
+
+public function updateStatus($id)
+{
+    $status = $this->request->getPost('status');
+    if ($this->transaction->updateStatus($id, $status)) {
+        return redirect()->back()->with('success', 'Status transaksi berhasil diperbarui.');
+    } else {
+        return redirect()->back()->with('error', 'Gagal memperbarui status transaksi.');
+    }
+}
+
 // public function getLocation() 
 // { 
 //         //keyword pencarian yang dikirimkan dari halaman checkout 
@@ -186,6 +237,24 @@ public function getCost()
     $body = json_decode($response->getBody(), true);  
     return $this->response->setJSON($body['data']); 
 } 
+
+public function uploadBukti()
+{
+    $id   = $this->request->getPost('id_pembelian');
+    $file = $this->request->getFile('bukti');
+
+    if ($file->isValid() && !$file->hasMoved()) {
+        $newName = $file->getRandomName();
+        $file->move('uploads/bukti/', $newName);
+        $this->transaction->update($id, [
+            'bukti_pembayaran' => $newName,
+            'status'           => 1,
+            'updated_at'       => date('Y-m-d H:i:s')
+        ]);
+        return redirect()->back()->with('success', 'Bukti pembayaran berhasil diupload.');
+    }
+    return redirect()->back()->with('error', 'Upload bukti gagal.');
+}
 
 public function cart_delete($rowid)
 {

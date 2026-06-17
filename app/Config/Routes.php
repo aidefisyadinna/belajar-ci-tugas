@@ -41,3 +41,11 @@ $routes->get('ongkir/city/(:num)', 'OngkirController::city/$1');
 
 $routes->get('get-location', 'TransaksiController::getLocation');
 $routes->get('get-cost', 'TransaksiController::getCost');
+$routes->post('/upload-bukti', 'TransaksiController::uploadBukti');
+$routes->post('buy', 'TransaksiController::buy', ['filter' => 'auth']);
+$routes->get('penjualan', 'Home::penjualan', ['filter' => 'auth']);
+$routes->post('penjualan/updateStatus/(:any)', 'TransaksiController::updateStatus/$1', ['filter' => 'auth']);
+$routes->resource('api', ['controller' => 'ApiController']);
+$routes->get('laporan/pendapatan', 'LaporanController::pendapatan', ['filter' => 'auth']);
+$routes->get('laporan/exportPdf', 'LaporanController::exportPdf', ['filter' => 'auth']);
+$routes->get('laporan/exportExcel', 'LaporanController::exportExcel', ['filter' => 'auth']);
