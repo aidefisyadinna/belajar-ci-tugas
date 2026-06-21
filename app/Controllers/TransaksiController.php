@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\TransactionModel; 
 use App\Models\TransactionDetailModel; 
+use App\Models\CartModel; 
 
 class TransaksiController extends BaseController
 {
@@ -14,6 +15,7 @@ class TransaksiController extends BaseController
     protected $apiKey;
     protected $transaction; 
     protected $transaction_detail; 
+    protected $cartModel;
 
     public function __construct()
     {
@@ -21,8 +23,9 @@ class TransaksiController extends BaseController
         $this->cart = service('cart');
         $this->client = new \GuzzleHttp\Client(); 
         $this->apiKey = env('COST_KEY');
-        $this->transaction=new TransactionModel(); 
-        $this->transaction_detail=new TransactionDetailModel(); 
+        $this->transaction = new TransactionModel(); 
+        $this->transaction_detail = new TransactionDetailModel(); 
+        $this->cartModel = new CartModel();
     }
 
     public function index()
@@ -46,6 +49,12 @@ public function cart_add()
 	        'foto' => $this->request->getPost('foto')
 	    ]
 	]);
+
+	$userId = session('id');
+	if ($userId) {
+	    $productId = $this->request->getPost('id');
+	    $this->cartModel->addOrUpdateItem($userId, $productId, 1);
+	}
 	
 	session()->setFlashdata(
 	    'success',
@@ -59,12 +68,21 @@ public function cart_edit()
 {
     $i = 1;
     foreach ($this->cart->contents() as $item) {
-        $qty = $this->request->getPost('qty' . $i++);
+        $qty = (int) $this->request->getPost('qty' . $i++);
+        if ($qty < 1) {
+            session()->setFlashdata('error', 'Qty harus minimal 1');
+            return redirect()->to(base_url('keranjang'));
+        }
 
         $this->cart->update([
             'rowid' => $item['rowid'],
             'qty'   => $qty
         ]);
+
+        $userId = session('id');
+        if ($userId) {
+            $this->cartModel->updateQty($userId, $item['id'], $qty);
+        }
     }
 
     session()->setFlashdata(
@@ -117,6 +135,12 @@ public function buy()
     }
 
     $this->cart->destroy();
+
+    $userId = session('id');
+    if ($userId) {
+        $this->cartModel->clearCart($userId);
+    }
+
     return redirect()->to('profile')->with('success', 'Pesanan berhasil dibuat!');
 }
 
@@ -258,7 +282,15 @@ public function uploadBukti()
 
 public function cart_delete($rowid)
 {
+    $item = $this->cart->getItem($rowid);
+    $productId = $item ? $item['id'] : null;
+
     $this->cart->remove($rowid);
+
+    $userId = session('id');
+    if ($userId && $productId) {
+        $this->cartModel->removeItem($userId, $productId);
+    }
 
     session()->setFlashdata(
         'success',
@@ -269,6 +301,11 @@ public function cart_delete($rowid)
 }
 public function cart_clear()
 {
+    $userId = session('id');
+    if ($userId) {
+        $this->cartModel->clearCart($userId);
+    }
+
     $this->cart->destroy();
 
     session()->setFlashdata(

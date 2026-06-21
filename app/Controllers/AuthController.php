@@ -5,7 +5,8 @@ namespace app\Controllers;
 use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 
-use App\Models\UserModel; 
+use App\Models\UserModel;
+use App\Models\CartModel; 
 
 class AuthController extends BaseController
 {
@@ -34,10 +35,32 @@ class AuthController extends BaseController
         if ($dataUser) {
 	        if (password_verify($password, $dataUser['password'])) {
                 session()->set([
-                    'username' => $dataUser['username'],
-                    'role' => $dataUser['role'],
+                    'id'         => $dataUser['id'],
+                    'username'   => $dataUser['username'],
+                    'role'       => $dataUser['role'],
                     'isLoggedIn' => TRUE
                 ]);
+
+                $userId = $dataUser['id'];
+                $cartModel = new CartModel();
+                $guestCart = service('cart')->contents();
+
+                foreach ($guestCart as $item) {
+                    $cartModel->addOrUpdateItem($userId, $item['id'], $item['qty']);
+                }
+
+                service('cart')->destroy();
+
+                $dbCart = $cartModel->getCartByUser($userId);
+                foreach ($dbCart as $item) {
+                    service('cart')->insert([
+                        'id'      => $item['product_id'],
+                        'qty'     => $item['qty'],
+                        'price'   => $item['harga'],
+                        'name'    => $item['nama'],
+                        'options' => ['foto' => $item['foto']],
+                    ]);
+                }
 
                 return redirect()->to(base_url('/'));
             } else {

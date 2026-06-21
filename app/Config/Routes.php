@@ -40,6 +40,7 @@ $routes->get('checkout', 'TransaksiController::checkout', ['filter' =>
 
 $routes->get('keranjang', 'TransaksiController::index', ['filter' => 'auth']);
 
+$routes->get('search', 'Home::search', ['filter' => 'auth']);
 $routes->get('faq','Home::faq',['filter'=>'auth']);
 $routes->get('profile','Home::profile',['filter'=>'auth']);
 $routes->get('contact','Home::contact',['filter'=>'auth']);

@@ -18,6 +18,18 @@ class Home extends BaseController
         $this->transaction = new TransactionModel();
         $this->transaction_detail = new TransactionDetailModel();
     }
+    public function search()
+    {
+        $query = $this->request->getGet('query');
+        if (!$query) {
+            return redirect()->to('/');
+        }
+        $products = $this->productModel
+            ->like('nama', $query)
+            ->findAll();
+        return view('v_home', ['products' => $products]);
+    }
+
     public function index()
     {
             return view('v_home', [
