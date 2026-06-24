@@ -29,10 +29,25 @@ class TransaksiController extends BaseController
     }
 
     public function index()
-    {  
+    {
+    $userId = session('id');
+    if ($userId) {
+        $dbItems = $this->cartModel->getCartByUser($userId);
+        $this->cart->destroy();
+        foreach ($dbItems as $row) {
+            $this->cart->insert([
+                'id'      => $row['product_id'],
+                'qty'     => $row['qty'],
+                'price'   => $row['harga'],
+                'name'    => $row['nama'],
+                'options' => ['foto' => $row['foto']],
+            ]);
+        }
+    }
+
     $data = [
         'items' => $this->cart->contents(),
-        'total' => $this->cart->total() 
+        'total' => $this->cart->total()
     ];
 
     return view('v_keranjang', $data);
