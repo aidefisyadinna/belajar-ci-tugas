@@ -30,10 +30,6 @@ class TransactionDetail extends Migration
                 'constraint' => 5,
                 'null' => FALSE,
             ],
-            'diskon' => [
-                'type' => 'DOUBLE',
-                'null' => TRUE,
-            ],
             'subtotal_harga' => [
                 'type' => 'DOUBLE',
                 'null' => FALSE,

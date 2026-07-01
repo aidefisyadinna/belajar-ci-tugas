@@ -47,7 +47,14 @@
             <td><?= $item['tanggal'] ?></td>
             <td>
               <?php if ($item['sisa'] > 0): ?>
-                <span class="badge bg-danger">Belum Lunas</span>
+                <span class="badge bg-danger mb-1 d-block">Belum Lunas</span>
+                <form action="<?= base_url('laporan/piutang/bayar/' . $item['id']) ?>" method="post">
+                  <?= csrf_field() ?>
+                  <button type="submit" class="btn btn-sm btn-success"
+                          onclick="return confirm('Tandai piutang ini sebagai lunas?')">
+                    <i class="bi bi-check-circle"></i> Bayar
+                  </button>
+                </form>
               <?php else: ?>
                 <span class="badge bg-success">Lunas</span>
               <?php endif; ?>
